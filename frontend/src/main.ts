@@ -33,7 +33,7 @@ window.addEventListener("DOMContentLoaded", () => {
       registrationForm.style.display = "none";
       successDiv.style.display = "block";
     } catch (error) {
-      console.error;
+      console.error(error);
       showError("There was a problem with the registration");
     }
     //if no internet, network error
@@ -79,7 +79,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (!isValidEmail) {
       isValid = false;
-      errorMessage += "Invalid email";
+      errorMessage += "Invalid email</br>";
       emailField.classList.add("error");
     } else {
       emailField.classList.remove("error");
@@ -88,8 +88,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (password.length < 5) {
       isValid = false;
-      errorMessage += "Password must be at least 5 characters";
+      errorMessage += "Password must be at least 5 characters</br>";
       passwordField.classList.add("error");
+      passwordConfirmationField.classList.add("error");
     } else {
       passwordField.classList.remove("error");
       passwordField.classList.add("success");
@@ -97,7 +98,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (password !== confirmPassword) {
       isValid = false;
-      errorMessage += "Password and confirmation don't match";
+      errorMessage += "Password and confirmation don't match</br>";
       passwordConfirmationField.classList.add("error");
     } else {
       passwordConfirmationField.classList.remove("error");
@@ -108,11 +109,14 @@ window.addEventListener("DOMContentLoaded", () => {
       const user = { email, password, confirmPassword };
 
       await postData(user);
+      errorDiv.style.display = "none";
     } else {
       showError(errorMessage);
     }
   };
 
-  registerButton.addEventListener("click", registerFunction);
+  registerButton.addEventListener("click", () => {
+    registerFunction();
+  });
   backToHomePageButton.addEventListener("click", showForm);
 });
