@@ -76,3 +76,5 @@ server.post("/api/register", async (req, res) => {
 
   res.send("Registration successfull");
 });
+
+server.listen(5002);
