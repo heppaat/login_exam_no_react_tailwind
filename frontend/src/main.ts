@@ -1,4 +1,6 @@
 import "./style.css";
+import { safeFetch } from "./http";
+import { z } from "zod";
 
 window.addEventListener("DOMContentLoaded", () => {
   const registrationForm = document.getElementById(
@@ -18,35 +20,30 @@ window.addEventListener("DOMContentLoaded", () => {
   ) as HTMLButtonElement;
   const errorDiv = document.getElementById("errorDiv") as HTMLDivElement;
 
-  type User = { email: string; password: string; confirmPassword: string };
+  const UserSchema = z.object({
+    email: z.string(),
+    password: z.string(),
+    confirmPassword: z.string(),
+  });
+
+  type User = z.infer<typeof UserSchema>;
+
+  let userData: any | null = null;
 
   //post function
   const postData = async (data: User) => {
-    let response = null;
     try {
-      response = await fetch("http://localhost:5002/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const response = await safeFetch(
+        "POST",
+        "http://localhost:5002/api/register",
+        UserSchema,
+        data
+      );
 
-      registrationForm.style.display = "none";
-      successDiv.style.display = "block";
+      if (!response.success) return;
     } catch (error) {
-      console.error(error);
-      showError("There was a problem with the registration");
+      console.error;
     }
-    //if no internet, network error
-    if (response === null) return alert("network error");
-
-    //if body input is invalid
-    if (response.status >= 400 && response.status < 500)
-      return alert("Invalid body input");
-
-    //if server has error
-    if (response.status >= 500) return alert("server error");
-
-    alert("Success");
   };
 
   //error function
@@ -66,57 +63,81 @@ window.addEventListener("DOMContentLoaded", () => {
     errorDiv.innerHTML = "";
   };
 
-  //register function
-  const registerFunction = async () => {
+  //form validation on Input
+
+  emailField.addEventListener("input", () => {
+    const email = emailField.value.trim();
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (isValidEmail) {
+      emailField.classList.remove("error");
+      emailField.classList.add("success");
+    } else {
+      emailField.classList.remove("success");
+      emailField.classList.add("error");
+    }
+  });
+
+  passwordField.addEventListener("input", () => {
+    const password = passwordField.value.trim();
+    if (password.length > 5) {
+      passwordField.classList.remove("error");
+      passwordField.classList.add("success");
+    } else {
+      passwordField.classList.remove("success");
+      passwordField.classList.add("error");
+    }
+  });
+
+  passwordConfirmationField.addEventListener("input", () => {
+    const password = passwordField.value.trim();
+    const confirmPassword = passwordConfirmationField.value.trim();
+    if (password === confirmPassword) {
+      passwordConfirmationField.classList.remove("error");
+      passwordConfirmationField.classList.add("success");
+    } else {
+      passwordConfirmationField.classList.remove("success");
+      passwordConfirmationField.classList.add("error");
+    }
+  });
+
+  //register Function
+
+  registerButton.addEventListener("click", async () => {
     const email = emailField.value.trim();
     const password = passwordField.value.trim();
     const confirmPassword = passwordConfirmationField.value.trim();
 
     let isValid = true;
-    let errorMessage = "";
 
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
     if (!isValidEmail) {
       isValid = false;
-      errorMessage += "Invalid email</br>";
-      emailField.classList.add("error");
-    } else {
-      emailField.classList.remove("error");
-      emailField.classList.add("success");
+      showError("Invalid email");
+      return;
     }
 
     if (password.length < 5) {
       isValid = false;
-      errorMessage += "Password must be at least 5 characters</br>";
-      passwordField.classList.add("error");
-      passwordConfirmationField.classList.add("error");
-    } else {
-      passwordField.classList.remove("error");
-      passwordField.classList.add("success");
+      showError("Password must be at least 5 characters");
+      return;
     }
 
     if (password !== confirmPassword) {
       isValid = false;
-      errorMessage += "Password and confirmation don't match</br>";
-      passwordConfirmationField.classList.add("error");
-    } else {
-      passwordConfirmationField.classList.remove("error");
-      passwordConfirmationField.classList.add("success");
+      showError("Password and confirmation don't match");
+      return;
     }
+
+    registerButton.disabled = !isValid;
 
     if (isValid) {
-      const user = { email, password, confirmPassword };
-
-      await postData(user);
-      errorDiv.style.display = "none";
+      userData = { email, password, confirmPassword };
+      await postData(userData);
+      registrationForm.style.display = "none";
+      successDiv.style.display = "block";
+      errorDiv.innerHTML = "";
     } else {
-      showError(errorMessage);
+      showError("Registration not successfull");
     }
-  };
-
-  registerButton.addEventListener("click", () => {
-    registerFunction();
   });
-  backToHomePageButton.addEventListener("click", showForm);
 });

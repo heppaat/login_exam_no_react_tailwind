@@ -65,10 +65,10 @@ server.post("/api/register", async (req, res) => {
   if (!existingUsers) return res.sendStatus(500);
 
   if (existingUsers.find((user) => user.email === email)) {
-    return res.status(400).send("Email already exists");
+    return res.status(409).send("Email already exists");
   }
 
-  const newUser = { email };
+  const newUser = { email, password };
   const updatedUsers = [...existingUsers, newUser];
 
   const isSuccessfull = await writeFile(updatedUsers);
