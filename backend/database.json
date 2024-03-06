@@ -1,6 +1,12 @@
 [
   {
     "email": "pali.herrer@gmail.com",
-    "password": "palika"
+    "password": "palkoka",
+    "id": 8296364
+  },
+  {
+    "email": "joco@gmail.com",
+    "password": "mucsika",
+    "id": 7509162
   }
 ]

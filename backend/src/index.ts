@@ -10,8 +10,13 @@ server.use(cors());
 //json formatum erkezik, megcsinalja a bodyt objecktkent
 server.use(express.json());
 
-type User = { email: string; password: string; confirmPassword: string };
-type postUser = { email: string };
+type User = {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  id: number;
+};
+type postUser = { email: string; password: string; id: number };
 
 const readFile = async () => {
   try {
@@ -68,7 +73,9 @@ server.post("/api/register", async (req, res) => {
     return res.status(409).send("Email already exists");
   }
 
-  const newUser = { email, password };
+  const randomNumber = Math.random() * (10000000 - 1) + 1;
+  const id = Math.floor(randomNumber);
+  const newUser = { email, password, id };
   const updatedUsers = [...existingUsers, newUser];
 
   const isSuccessfull = await writeFile(updatedUsers);
