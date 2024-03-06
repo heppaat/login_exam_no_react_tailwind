@@ -2,142 +2,149 @@ import "./style.css";
 import { safeFetch } from "./http";
 import { z } from "zod";
 
-window.addEventListener("DOMContentLoaded", () => {
-  const registrationForm = document.getElementById(
-    "registrationForm"
-  ) as HTMLDivElement;
-  const emailField = document.getElementById("email") as HTMLInputElement;
-  const passwordField = document.getElementById("password") as HTMLInputElement;
-  const passwordConfirmationField = document.getElementById(
-    "passwordConfirmation"
-  ) as HTMLInputElement;
-  const registerButton = document.getElementById(
-    "register"
-  ) as HTMLButtonElement;
-  const successDiv = document.getElementById("successDiv") as HTMLDivElement;
-  const backToHomePageButton = document.getElementById(
-    "backToHomepage"
-  ) as HTMLButtonElement;
-  const errorDiv = document.getElementById("errorDiv") as HTMLDivElement;
+const registrationForm = document.getElementById(
+  "registrationForm"
+) as HTMLDivElement;
+const emailField = document.getElementById("email") as HTMLInputElement;
+const passwordField = document.getElementById("password") as HTMLInputElement;
+const passwordConfirmationField = document.getElementById(
+  "passwordConfirmation"
+) as HTMLInputElement;
+const registerButton = document.getElementById("register") as HTMLButtonElement;
+const successDiv = document.getElementById("successDiv") as HTMLDivElement;
+const backToHomePageButton = document.getElementById(
+  "backToHomePageButton"
+) as HTMLButtonElement;
 
-  const UserSchema = z.object({
-    email: z.string(),
-    password: z.string(),
-    confirmPassword: z.string(),
-  });
+const errorDiv = document.getElementById("errorDiv") as HTMLDivElement;
 
-  type User = z.infer<typeof UserSchema>;
+registerButton.disabled = true;
 
-  let userData: any | null = null;
+const UserSchema = z.object({
+  email: z.string(),
+  password: z.string(),
+  confirmPassword: z.string(),
+});
 
-  //post function
-  const postData = async (data: User) => {
-    try {
-      const response = await safeFetch(
-        "POST",
-        "http://localhost:5002/api/register",
-        UserSchema,
-        data
+type User = z.infer<typeof UserSchema>;
+
+let userData: User | null = null;
+
+//post function
+const postData = async (data: User) => {
+  const response = await safeFetch(
+    "POST",
+    "http://localhost:5002/api/register",
+    UserSchema,
+    data
+  );
+
+  if (!response.success) {
+    if (response.status === 409) {
+      showError(
+        `Email is already registered</br><button id="back">Back to homepage</button>`
       );
-
-      if (!response.success) return;
-    } catch (error) {
-      console.error;
+      successDiv.innerHTML = "";
+      const backButton = document.getElementById("back") as HTMLButtonElement;
+      backButton.addEventListener("click", () => {
+        window.location.reload();
+      });
     }
-  };
+  }
+  return;
+};
 
-  //error function
-  const showError = (message: string) => {
-    errorDiv.innerHTML = message;
-    errorDiv.style.display = "block";
-  };
+//error function
+const showError = (message: string) => {
+  errorDiv.innerHTML = message;
+  errorDiv.style.display = "block";
+};
 
-  //show form function
-  const showForm = () => {
-    registrationForm.style.display = "block";
-    successDiv.style.display = "none";
-    errorDiv.style.display = "none";
-    emailField.value = "";
-    passwordField.value = "";
-    passwordConfirmationField.value = "";
+//form validation on Input
+
+let errorMessage = "";
+
+const checkValidity = () => {
+  const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    emailField.value.trim()
+  );
+  const isPasswordValid = passwordField.value.trim().length > 5;
+  const isConfirmationValid =
+    passwordConfirmationField.value.trim() === passwordField.value.trim();
+
+  registerButton.disabled = !(
+    isValidEmail &&
+    isPasswordValid &&
+    isConfirmationValid
+  );
+};
+
+emailField.addEventListener("input", () => {
+  const email = emailField.value.trim();
+  const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (isValidEmail) {
+    emailField.classList.remove("error");
+    emailField.classList.add("success");
+
+    errorMessage = "";
     errorDiv.innerHTML = "";
-  };
+  } else {
+    emailField.classList.remove("success");
+    emailField.classList.add("error");
 
-  //form validation on Input
+    errorMessage = "Invalid email";
+    showError(errorMessage);
+  }
+  checkValidity();
+});
 
-  emailField.addEventListener("input", () => {
-    const email = emailField.value.trim();
-    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    if (isValidEmail) {
-      emailField.classList.remove("error");
-      emailField.classList.add("success");
-    } else {
-      emailField.classList.remove("success");
-      emailField.classList.add("error");
-    }
-  });
+passwordField.addEventListener("input", () => {
+  const password = passwordField.value.trim();
+  if (password.length > 5) {
+    passwordField.classList.remove("error");
+    passwordField.classList.add("success");
 
-  passwordField.addEventListener("input", () => {
-    const password = passwordField.value.trim();
-    if (password.length > 5) {
-      passwordField.classList.remove("error");
-      passwordField.classList.add("success");
-    } else {
-      passwordField.classList.remove("success");
-      passwordField.classList.add("error");
-    }
-  });
+    errorMessage = "";
+    errorDiv.innerHTML = "";
+  } else {
+    passwordField.classList.remove("success");
+    passwordField.classList.add("error");
 
-  passwordConfirmationField.addEventListener("input", () => {
-    const password = passwordField.value.trim();
-    const confirmPassword = passwordConfirmationField.value.trim();
-    if (password === confirmPassword) {
-      passwordConfirmationField.classList.remove("error");
-      passwordConfirmationField.classList.add("success");
-    } else {
-      passwordConfirmationField.classList.remove("success");
-      passwordConfirmationField.classList.add("error");
-    }
-  });
+    errorMessage = "Password must be at least 5 characters";
+    showError(errorMessage);
+  }
+  checkValidity();
+});
 
-  //register Function
+passwordConfirmationField.addEventListener("input", () => {
+  const password = passwordField.value.trim();
+  const confirmPassword = passwordConfirmationField.value.trim();
+  if (password === confirmPassword) {
+    passwordConfirmationField.classList.remove("error");
+    passwordConfirmationField.classList.add("success");
 
-  registerButton.addEventListener("click", async () => {
-    const email = emailField.value.trim();
-    const password = passwordField.value.trim();
-    const confirmPassword = passwordConfirmationField.value.trim();
+    errorMessage = "";
+    errorDiv.innerHTML = "";
+  } else {
+    passwordConfirmationField.classList.remove("success");
+    passwordConfirmationField.classList.add("error");
 
-    let isValid = true;
+    errorMessage = "Password and confirmation don't match";
+    showError(errorMessage);
+  }
+  checkValidity();
+});
 
-    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    if (!isValidEmail) {
-      isValid = false;
-      showError("Invalid email");
-      return;
-    }
+registerButton.addEventListener("click", async () => {
+  const email = emailField.value.trim();
+  const password = passwordField.value.trim();
+  const confirmPassword = passwordConfirmationField.value.trim();
 
-    if (password.length < 5) {
-      isValid = false;
-      showError("Password must be at least 5 characters");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      isValid = false;
-      showError("Password and confirmation don't match");
-      return;
-    }
-
-    registerButton.disabled = !isValid;
-
-    if (isValid) {
-      userData = { email, password, confirmPassword };
-      await postData(userData);
-      registrationForm.style.display = "none";
-      successDiv.style.display = "block";
-      errorDiv.innerHTML = "";
-    } else {
-      showError("Registration not successfull");
-    }
-  });
+  userData = { email, password, confirmPassword };
+  await postData(userData);
+  registrationForm.style.display = "none";
+  successDiv.style.display = "block";
+});
+backToHomePageButton.addEventListener("click", () => {
+  window.location.reload();
 });
