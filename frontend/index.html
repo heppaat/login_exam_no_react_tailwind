@@ -8,18 +8,26 @@
   </head>
   <body>
     <div id="app"></div>
-    <div id="registrationForm">
-      <input type="email" id="email" placeholder="Email" autofocus />
-      <input type="password" id="password" placeholder="Password" />
-      <input
-        type="password"
-        id="passwordConfirmation"
-        placeholder="Confirm Password"
-      />
-      <button id="register">Register</button>
+    <div
+      id="registrationForm"
+      class="h-56 flex flex-col items-center justify-around"
+    >
+      <div><input type="email" id="email" placeholder="Email" autofocus /></div>
+      <div><input type="password" id="password" placeholder="Password" /></div>
+      <div>
+        <input
+          type="password"
+          id="passwordConfirmation"
+          placeholder="Confirm Password"
+        />
+      </div>
+      <div><button id="register" class="btn btn-primary">Register</button></div>
     </div>
     <div id="successDiv" style="display: none">
-      Registration Successfull <br /><button id="backToHomePageButton">
+      Registration Successfull <br /><button
+        id="backToHomePageButton"
+        class="btn btn-secondary"
+      >
         Back To Homepage
       </button>
     </div>

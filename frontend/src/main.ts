@@ -42,7 +42,7 @@ const postData = async (data: User) => {
   if (!response.success) {
     if (response.status === 409) {
       showError(
-        `Email is already registered</br><button id="back">Back to homepage</button>`
+        `Email is already registered</br><button id="back" class="btn btn-secondary">Back to homepage</button>`
       );
       successDiv.innerHTML = "";
       const backButton = document.getElementById("back") as HTMLButtonElement;
