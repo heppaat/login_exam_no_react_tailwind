@@ -3,17 +3,17 @@
 @tailwind utilities;
 
 .error {
-  border: 3px solid rgb(236, 37, 37);
+  border: 3px solid rgb(255, 0, 0);
 }
 
 .success {
-  border: 3px solid rgb(64, 255, 64);
+  border: 3px solid rgb(0, 255, 0);
 }
 
 #errorDiv {
-  color: rgb(243, 64, 64);
+  color: rgb(255, 0, 0);
 }
 
 #successDiv {
-  color: rgb(99, 242, 99);
+  color: rgb(0, 255, 0);
 }

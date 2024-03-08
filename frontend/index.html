@@ -10,7 +10,7 @@
     <div id="app"></div>
     <div
       id="registrationForm"
-      class="h-56 flex flex-col items-center justify-around"
+      class="h-96 flex flex-col items-center justify-around pt-36"
     >
       <div><input type="email" id="email" placeholder="Email" autofocus /></div>
       <div><input type="password" id="password" placeholder="Password" /></div>
@@ -23,16 +23,22 @@
       </div>
       <div><button id="register" class="btn btn-primary">Register</button></div>
     </div>
-    <div id="successDiv" style="display: none">
-      Registration Successfull <br /><button
-        id="backToHomePageButton"
-        class="btn btn-secondary"
-      >
-        Back To Homepage
-      </button>
+    <div
+      id="successDiv"
+      class="h-52 hidden flex-col items-center justify-evenly"
+    >
+      <p>Registration Successfull <br /></p>
+      <div>
+        <button id="backToHomePageButton" class="btn btn-secondary">
+          Back To Homepage
+        </button>
+      </div>
     </div>
 
-    <div id="errorDiv" style="display: none"></div>
+    <div
+      id="errorDiv"
+      class="h-52 hidden flex-col items-center justify-evenly"
+    ></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

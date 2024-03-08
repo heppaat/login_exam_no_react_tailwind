@@ -57,7 +57,7 @@ const postData = async (data: User) => {
 //error function
 const showError = (message: string) => {
   errorDiv.innerHTML = message;
-  errorDiv.style.display = "block";
+  errorDiv.style.display = "flex";
 };
 
 //form validation on Input
@@ -143,7 +143,7 @@ registerButton.addEventListener("click", async () => {
   userData = { email, password, confirmPassword };
   await postData(userData);
   registrationForm.style.display = "none";
-  successDiv.style.display = "block";
+  successDiv.style.display = "flex";
 });
 backToHomePageButton.addEventListener("click", () => {
   window.location.reload();
